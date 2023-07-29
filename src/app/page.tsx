@@ -5,7 +5,7 @@ import awsExports from '../aws-exports';
 import { useEffect, useState } from 'react';
 import { Folder } from '@/models';
 import FolderView from '../components/FolderView';
-import { Authenticator, Grid, Card, Button, useTheme } from '@aws-amplify/ui-react';
+import { Authenticator, Grid, Card } from '@aws-amplify/ui-react';
 
 
 Amplify.configure(awsExports);
