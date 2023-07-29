@@ -1,6 +1,13 @@
+'use client'
 import './globals.css'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+import { Amplify } from 'aws-amplify';
+import '@aws-amplify/ui-react/styles.css';
+import awsExports from '../aws-exports';
+import { HeadingThemeExample } from '@/components/Heading';
+
+Amplify.configure(awsExports);
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -16,7 +23,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <HeadingThemeExample />
+        {children}
+      </body>
     </html>
   )
 }

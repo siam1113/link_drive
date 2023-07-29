@@ -1,0 +1,21 @@
+type Tag @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  name: String
+}
+
+type Category @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  name: String
+}
+
+type Folder @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  name: String
+}
+
+type Link @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  name: String!
+  url: String!
+  added: AWSTimestamp!
+}
