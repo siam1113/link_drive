@@ -5,10 +5,8 @@ import { Inter } from 'next/font/google'
 import { Amplify } from 'aws-amplify';
 import '@aws-amplify/ui-react/styles.css';
 import awsExports from '../aws-exports';
-import { ThemeProvider } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
-import { studioTheme } from "@/ui-components";
-import { HeadingThemeExample } from '@/components/Heading';
+
 
 Amplify.configure(awsExports);
 

@@ -46,7 +46,7 @@ export default function Home() {
 
   return (
     <Authenticator>
-      {({ signOut, user }) => (
+      {({ signOut }) => (
         <Grid
           columnGap="0.5rem"
           rowGap="0.5rem"
