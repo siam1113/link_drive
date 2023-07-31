@@ -28,3 +28,7 @@ body {
       transparent,
       rgb(var(--background-end-rgb))) rgb(var(--background-start-rgb));
 }
+
+button.amplify-button[type="submit"] {
+  background-color: darkcyan !important;
+}
