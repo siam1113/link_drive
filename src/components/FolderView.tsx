@@ -1,6 +1,6 @@
 import React from 'react'
 import { Collection, Text, Divider } from '@aws-amplify/ui-react';
-import { Folder, Link } from '@/models';
+import { Folder } from '@/models';
 import { LuFolders } from 'react-icons/lu';
 import { PiFolderSimpleLight, PiFolderSimpleMinus, PiFolderSimplePlus } from 'react-icons/pi';
 import { MdOutlineDelete } from 'react-icons/md';
