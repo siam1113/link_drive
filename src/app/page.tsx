@@ -45,7 +45,7 @@ export default function Home() {
   }, [activeFolder]);
 
   return (
-    <Authenticator>
+    <Authenticator variation="modal">
       {({ signOut }) => (
         <Grid
           columnGap="0.5rem"
