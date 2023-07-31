@@ -5,9 +5,9 @@
  **************************************************************************/
 
 import * as React from "react";
-import { GridProps, TextFieldProps } from "@aws-amplify/ui-react";
+import { AutocompleteProps, GridProps, TextFieldProps } from "@aws-amplify/ui-react";
 import { EscapeHatchProps } from "@aws-amplify/ui-react/internal";
-import { Link } from "../models";
+import { Link, Folder as Folder0 } from "../models";
 export declare type ValidationResponse = {
     hasError: boolean;
     errorMessage?: string;
@@ -16,19 +16,19 @@ export declare type ValidationFunction<T> = (value: T, validationResponse: Valid
 export declare type LinkUpdateFormInputValues = {
     name?: string;
     url?: string;
-    added?: number;
+    Folder?: Folder0[];
 };
 export declare type LinkUpdateFormValidationValues = {
     name?: ValidationFunction<string>;
     url?: ValidationFunction<string>;
-    added?: ValidationFunction<number>;
+    Folder?: ValidationFunction<Folder0>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type LinkUpdateFormOverridesProps = {
     LinkUpdateFormGrid?: PrimitiveOverrideProps<GridProps>;
     name?: PrimitiveOverrideProps<TextFieldProps>;
     url?: PrimitiveOverrideProps<TextFieldProps>;
-    added?: PrimitiveOverrideProps<TextFieldProps>;
+    Folder?: PrimitiveOverrideProps<AutocompleteProps>;
 } & EscapeHatchProps;
 export declare type LinkUpdateFormProps = React.PropsWithChildren<{
     overrides?: LinkUpdateFormOverridesProps | undefined | null;
@@ -38,6 +38,7 @@ export declare type LinkUpdateFormProps = React.PropsWithChildren<{
     onSubmit?: (fields: LinkUpdateFormInputValues) => LinkUpdateFormInputValues;
     onSuccess?: (fields: LinkUpdateFormInputValues) => void;
     onError?: (fields: LinkUpdateFormInputValues, errorMessage: string) => void;
+    onCancel?: () => void;
     onChange?: (fields: LinkUpdateFormInputValues) => LinkUpdateFormInputValues;
     onValidate?: LinkUpdateFormValidationValues;
 } & React.CSSProperties>;

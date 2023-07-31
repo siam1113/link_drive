@@ -6,17 +6,191 @@
 
 /* eslint-disable */
 import * as React from "react";
-import { Button, Flex, Grid, TextField } from "@aws-amplify/ui-react";
-import { getOverrideProps } from "@aws-amplify/ui-react/internal";
-import { Link } from "../models";
+import {
+  Autocomplete,
+  Badge,
+  Button,
+  Divider,
+  Flex,
+  Grid,
+  Icon,
+  ScrollView,
+  Text,
+  TextField,
+  useTheme,
+} from "@aws-amplify/ui-react";
+import {
+  getOverrideProps,
+  useDataStoreBinding,
+} from "@aws-amplify/ui-react/internal";
+import { Link, Folder as Folder0, LinkFolder } from "../models";
 import { fetchByPath, validateField } from "./utils";
 import { DataStore } from "aws-amplify";
+function ArrayField({
+  items = [],
+  onChange,
+  label,
+  inputFieldRef,
+  children,
+  hasError,
+  setFieldValue,
+  currentFieldValue,
+  defaultFieldValue,
+  lengthLimit,
+  getBadgeText,
+  errorMessage,
+}) {
+  const labelElement = <Text>{label}</Text>;
+  const {
+    tokens: {
+      components: {
+        fieldmessages: { error: errorStyles },
+      },
+    },
+  } = useTheme();
+  const [selectedBadgeIndex, setSelectedBadgeIndex] = React.useState();
+  const [isEditing, setIsEditing] = React.useState();
+  React.useEffect(() => {
+    if (isEditing) {
+      inputFieldRef?.current?.focus();
+    }
+  }, [isEditing]);
+  const removeItem = async (removeIndex) => {
+    const newItems = items.filter((value, index) => index !== removeIndex);
+    await onChange(newItems);
+    setSelectedBadgeIndex(undefined);
+  };
+  const addItem = async () => {
+    if (
+      currentFieldValue !== undefined &&
+      currentFieldValue !== null &&
+      currentFieldValue !== "" &&
+      !hasError
+    ) {
+      const newItems = [...items];
+      if (selectedBadgeIndex !== undefined) {
+        newItems[selectedBadgeIndex] = currentFieldValue;
+        setSelectedBadgeIndex(undefined);
+      } else {
+        newItems.push(currentFieldValue);
+      }
+      await onChange(newItems);
+      setIsEditing(false);
+    }
+  };
+  const arraySection = (
+    <React.Fragment>
+      {!!items?.length && (
+        <ScrollView height="inherit" width="inherit" maxHeight={"7rem"}>
+          {items.map((value, index) => {
+            return (
+              <Badge
+                key={index}
+                style={{
+                  cursor: "pointer",
+                  alignItems: "center",
+                  marginRight: 3,
+                  marginTop: 3,
+                  backgroundColor:
+                    index === selectedBadgeIndex ? "#B8CEF9" : "",
+                }}
+                onClick={() => {
+                  setSelectedBadgeIndex(index);
+                  setFieldValue(items[index]);
+                  setIsEditing(true);
+                }}
+              >
+                {getBadgeText ? getBadgeText(value) : value.toString()}
+                <Icon
+                  style={{
+                    cursor: "pointer",
+                    paddingLeft: 3,
+                    width: 20,
+                    height: 20,
+                  }}
+                  viewBox={{ width: 20, height: 20 }}
+                  paths={[
+                    {
+                      d: "M10 10l5.09-5.09L10 10l5.09 5.09L10 10zm0 0L4.91 4.91 10 10l-5.09 5.09L10 10z",
+                      stroke: "black",
+                    },
+                  ]}
+                  ariaLabel="button"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    removeItem(index);
+                  }}
+                />
+              </Badge>
+            );
+          })}
+        </ScrollView>
+      )}
+      <Divider orientation="horizontal" marginTop={5} />
+    </React.Fragment>
+  );
+  if (lengthLimit !== undefined && items.length >= lengthLimit && !isEditing) {
+    return (
+      <React.Fragment>
+        {labelElement}
+        {arraySection}
+      </React.Fragment>
+    );
+  }
+  return (
+    <React.Fragment>
+      {labelElement}
+      {isEditing && children}
+      {!isEditing ? (
+        <>
+          <Button
+            onClick={() => {
+              setIsEditing(true);
+            }}
+          >
+            Add item
+          </Button>
+          {errorMessage && hasError && (
+            <Text color={errorStyles.color} fontSize={errorStyles.fontSize}>
+              {errorMessage}
+            </Text>
+          )}
+        </>
+      ) : (
+        <Flex justifyContent="flex-end">
+          {(currentFieldValue || isEditing) && (
+            <Button
+              children="Cancel"
+              type="button"
+              size="small"
+              onClick={() => {
+                setFieldValue(defaultFieldValue);
+                setIsEditing(false);
+                setSelectedBadgeIndex(undefined);
+              }}
+            ></Button>
+          )}
+          <Button
+            size="small"
+            variation="link"
+            isDisabled={hasError}
+            onClick={addItem}
+          >
+            {selectedBadgeIndex !== undefined ? "Save" : "Add"}
+          </Button>
+        </Flex>
+      )}
+      {arraySection}
+    </React.Fragment>
+  );
+}
 export default function LinkCreateForm(props) {
   const {
     clearOnSuccess = true,
     onSuccess,
     onError,
     onSubmit,
+    onCancel,
     onValidate,
     onChange,
     overrides,
@@ -25,22 +199,43 @@ export default function LinkCreateForm(props) {
   const initialValues = {
     name: "",
     url: "",
-    added: "",
+    Folder: [],
   };
   const [name, setName] = React.useState(initialValues.name);
   const [url, setUrl] = React.useState(initialValues.url);
-  const [added, setAdded] = React.useState(initialValues.added);
+  const [Folder, setFolder] = React.useState(initialValues.Folder);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     setName(initialValues.name);
     setUrl(initialValues.url);
-    setAdded(initialValues.added);
+    setFolder(initialValues.Folder);
+    setCurrentFolderValue(undefined);
+    setCurrentFolderDisplayValue("");
     setErrors({});
+  };
+  const [currentFolderDisplayValue, setCurrentFolderDisplayValue] =
+    React.useState("");
+  const [currentFolderValue, setCurrentFolderValue] = React.useState(undefined);
+  const FolderRef = React.createRef();
+  const getIDValue = {
+    Folder: (r) => JSON.stringify({ id: r?.id }),
+  };
+  const FolderIdSet = new Set(
+    Array.isArray(Folder)
+      ? Folder.map((r) => getIDValue.Folder?.(r))
+      : getIDValue.Folder?.(Folder)
+  );
+  const folderRecords = useDataStoreBinding({
+    type: "collection",
+    model: Folder0,
+  }).items;
+  const getDisplayValue = {
+    Folder: (r) => `${r?.name}`,
   };
   const validations = {
     name: [{ type: "Required" }],
-    url: [{ type: "Required" }],
-    added: [{ type: "Required" }],
+    url: [{ type: "Required" }, { type: "URL" }],
+    Folder: [{ type: "Required", validationMessage: "Folder is required." }],
   };
   const runValidationTasks = async (
     fieldName,
@@ -59,29 +254,6 @@ export default function LinkCreateForm(props) {
     setErrors((errors) => ({ ...errors, [fieldName]: validationResponse }));
     return validationResponse;
   };
-  const convertTimeStampToDate = (ts) => {
-    if (Math.abs(Date.now() - ts) < Math.abs(Date.now() - ts * 1000)) {
-      return new Date(ts);
-    }
-    return new Date(ts * 1000);
-  };
-  const convertToLocal = (date) => {
-    const df = new Intl.DateTimeFormat("default", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-      calendar: "iso8601",
-      numberingSystem: "latn",
-      hourCycle: "h23",
-    });
-    const parts = df.formatToParts(date).reduce((acc, part) => {
-      acc[part.type] = part.value;
-      return acc;
-    }, {});
-    return `${parts.year}-${parts.month}-${parts.day}T${parts.hour}:${parts.minute}`;
-  };
   return (
     <Grid
       as="form"
@@ -93,20 +265,28 @@ export default function LinkCreateForm(props) {
         let modelFields = {
           name,
           url,
-          added,
+          Folder,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
             if (Array.isArray(modelFields[fieldName])) {
               promises.push(
                 ...modelFields[fieldName].map((item) =>
-                  runValidationTasks(fieldName, item)
+                  runValidationTasks(
+                    fieldName,
+                    item,
+                    getDisplayValue[fieldName]
+                  )
                 )
               );
               return promises;
             }
             promises.push(
-              runValidationTasks(fieldName, modelFields[fieldName])
+              runValidationTasks(
+                fieldName,
+                modelFields[fieldName],
+                getDisplayValue[fieldName]
+              )
             );
             return promises;
           }, [])
@@ -123,7 +303,26 @@ export default function LinkCreateForm(props) {
               modelFields[key] = undefined;
             }
           });
-          await DataStore.save(new Link(modelFields));
+          const modelFieldsToSave = {
+            name: modelFields.name,
+            url: modelFields.url,
+          };
+          const link = await DataStore.save(new Link(modelFieldsToSave));
+          const promises = [];
+          promises.push(
+            ...Folder.reduce((promises, folder) => {
+              promises.push(
+                DataStore.save(
+                  new LinkFolder({
+                    link,
+                    folder,
+                  })
+                )
+              );
+              return promises;
+            }, [])
+          );
+          await Promise.all(promises);
           if (onSuccess) {
             onSuccess(modelFields);
           }
@@ -150,7 +349,7 @@ export default function LinkCreateForm(props) {
             const modelFields = {
               name: value,
               url,
-              added,
+              Folder,
             };
             const result = onChange(modelFields);
             value = result?.name ?? value;
@@ -176,7 +375,7 @@ export default function LinkCreateForm(props) {
             const modelFields = {
               name,
               url: value,
-              added,
+              Folder,
             };
             const result = onChange(modelFields);
             value = result?.url ?? value;
@@ -191,34 +390,79 @@ export default function LinkCreateForm(props) {
         hasError={errors.url?.hasError}
         {...getOverrideProps(overrides, "url")}
       ></TextField>
-      <TextField
-        label="Added"
-        isRequired={true}
-        isReadOnly={false}
-        type="datetime-local"
-        value={added && convertToLocal(convertTimeStampToDate(added))}
-        onChange={(e) => {
-          let value =
-            e.target.value === "" ? "" : Number(new Date(e.target.value));
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
           if (onChange) {
             const modelFields = {
               name,
               url,
-              added: value,
+              Folder: values,
             };
             const result = onChange(modelFields);
-            value = result?.added ?? value;
+            values = result?.Folder ?? values;
           }
-          if (errors.added?.hasError) {
-            runValidationTasks("added", value);
-          }
-          setAdded(value);
+          setFolder(values);
+          setCurrentFolderValue(undefined);
+          setCurrentFolderDisplayValue("");
         }}
-        onBlur={() => runValidationTasks("added", added)}
-        errorMessage={errors.added?.errorMessage}
-        hasError={errors.added?.hasError}
-        {...getOverrideProps(overrides, "added")}
-      ></TextField>
+        currentFieldValue={currentFolderValue}
+        label={"Folder"}
+        items={Folder}
+        hasError={errors?.Folder?.hasError}
+        errorMessage={errors?.Folder?.errorMessage}
+        getBadgeText={getDisplayValue.Folder}
+        setFieldValue={(model) => {
+          setCurrentFolderDisplayValue(
+            model ? getDisplayValue.Folder(model) : ""
+          );
+          setCurrentFolderValue(model);
+        }}
+        inputFieldRef={FolderRef}
+        defaultFieldValue={""}
+      >
+        <Autocomplete
+          label="Folder"
+          isRequired={true}
+          isReadOnly={false}
+          placeholder="Search Folder"
+          value={currentFolderDisplayValue}
+          options={folderRecords
+            .filter((r) => !FolderIdSet.has(getIDValue.Folder?.(r)))
+            .map((r) => ({
+              id: getIDValue.Folder?.(r),
+              label: getDisplayValue.Folder?.(r),
+            }))}
+          onSelect={({ id, label }) => {
+            setCurrentFolderValue(
+              folderRecords.find((r) =>
+                Object.entries(JSON.parse(id)).every(
+                  ([key, value]) => r[key] === value
+                )
+              )
+            );
+            setCurrentFolderDisplayValue(label);
+            runValidationTasks("Folder", label);
+          }}
+          onClear={() => {
+            setCurrentFolderDisplayValue("");
+          }}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.Folder?.hasError) {
+              runValidationTasks("Folder", value);
+            }
+            setCurrentFolderDisplayValue(value);
+            setCurrentFolderValue(undefined);
+          }}
+          onBlur={() => runValidationTasks("Folder", currentFolderDisplayValue)}
+          errorMessage={errors.Folder?.errorMessage}
+          hasError={errors.Folder?.hasError}
+          ref={FolderRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "Folder")}
+        ></Autocomplete>
+      </ArrayField>
       <Flex
         justifyContent="space-between"
         {...getOverrideProps(overrides, "CTAFlex")}
@@ -236,6 +480,14 @@ export default function LinkCreateForm(props) {
           gap="15px"
           {...getOverrideProps(overrides, "RightAlignCTASubFlex")}
         >
+          <Button
+            children="Cancel"
+            type="button"
+            onClick={() => {
+              onCancel && onCancel();
+            }}
+            {...getOverrideProps(overrides, "CancelButton")}
+          ></Button>
           <Button
             children="Submit"
             type="submit"

@@ -1,21 +1,13 @@
-type Tag @model @auth(rules: [{allow: public}]) {
-  id: ID!
-  name: String
-}
-
-type Category @model @auth(rules: [{allow: public}]) {
-  id: ID!
-  name: String
-}
-
 type Folder @model @auth(rules: [{allow: public}]) {
   id: ID!
-  name: String
+  name: String!
+  Link: [Link] @manyToMany(relationName: "LinkFolder")
 }
 
 type Link @model @auth(rules: [{allow: public}]) {
   id: ID!
   name: String!
-  url: String!
-  added: AWSTimestamp!
+  url: AWSURL!
+  Folder: [Folder!] @manyToMany(relationName: "LinkFolder")
 }
+ 

@@ -22,7 +22,7 @@ const theme: Theme = {
 
 export const HeadingThemeExample = () => (
   <ThemeProvider theme={theme} colorMode="light">
-    <Flex direction="column">
+    <Flex direction="row">
       <Heading level={1}>Link Drive</Heading>
     </Flex>
   </ThemeProvider>

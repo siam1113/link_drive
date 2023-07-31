@@ -5,8 +5,9 @@
  **************************************************************************/
 
 import * as React from "react";
-import { GridProps, TextFieldProps } from "@aws-amplify/ui-react";
+import { AutocompleteProps, GridProps, TextFieldProps } from "@aws-amplify/ui-react";
 import { EscapeHatchProps } from "@aws-amplify/ui-react/internal";
+import { Folder as Folder0 } from "../models";
 export declare type ValidationResponse = {
     hasError: boolean;
     errorMessage?: string;
@@ -15,19 +16,19 @@ export declare type ValidationFunction<T> = (value: T, validationResponse: Valid
 export declare type LinkCreateFormInputValues = {
     name?: string;
     url?: string;
-    added?: number;
+    Folder?: Folder0[];
 };
 export declare type LinkCreateFormValidationValues = {
     name?: ValidationFunction<string>;
     url?: ValidationFunction<string>;
-    added?: ValidationFunction<number>;
+    Folder?: ValidationFunction<Folder0>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type LinkCreateFormOverridesProps = {
     LinkCreateFormGrid?: PrimitiveOverrideProps<GridProps>;
     name?: PrimitiveOverrideProps<TextFieldProps>;
     url?: PrimitiveOverrideProps<TextFieldProps>;
-    added?: PrimitiveOverrideProps<TextFieldProps>;
+    Folder?: PrimitiveOverrideProps<AutocompleteProps>;
 } & EscapeHatchProps;
 export declare type LinkCreateFormProps = React.PropsWithChildren<{
     overrides?: LinkCreateFormOverridesProps | undefined | null;
@@ -36,6 +37,7 @@ export declare type LinkCreateFormProps = React.PropsWithChildren<{
     onSubmit?: (fields: LinkCreateFormInputValues) => LinkCreateFormInputValues;
     onSuccess?: (fields: LinkCreateFormInputValues) => void;
     onError?: (fields: LinkCreateFormInputValues, errorMessage: string) => void;
+    onCancel?: () => void;
     onChange?: (fields: LinkCreateFormInputValues) => LinkCreateFormInputValues;
     onValidate?: LinkCreateFormValidationValues;
 } & React.CSSProperties>;

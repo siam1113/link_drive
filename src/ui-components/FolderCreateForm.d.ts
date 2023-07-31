@@ -5,8 +5,9 @@
  **************************************************************************/
 
 import * as React from "react";
-import { GridProps, TextFieldProps } from "@aws-amplify/ui-react";
+import { AutocompleteProps, GridProps, TextFieldProps } from "@aws-amplify/ui-react";
 import { EscapeHatchProps } from "@aws-amplify/ui-react/internal";
+import { Link as Link0 } from "../models";
 export declare type ValidationResponse = {
     hasError: boolean;
     errorMessage?: string;
@@ -14,14 +15,17 @@ export declare type ValidationResponse = {
 export declare type ValidationFunction<T> = (value: T, validationResponse: ValidationResponse) => ValidationResponse | Promise<ValidationResponse>;
 export declare type FolderCreateFormInputValues = {
     name?: string;
+    Link?: Link0[];
 };
 export declare type FolderCreateFormValidationValues = {
     name?: ValidationFunction<string>;
+    Link?: ValidationFunction<Link0>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type FolderCreateFormOverridesProps = {
     FolderCreateFormGrid?: PrimitiveOverrideProps<GridProps>;
     name?: PrimitiveOverrideProps<TextFieldProps>;
+    Link?: PrimitiveOverrideProps<AutocompleteProps>;
 } & EscapeHatchProps;
 export declare type FolderCreateFormProps = React.PropsWithChildren<{
     overrides?: FolderCreateFormOverridesProps | undefined | null;
@@ -30,6 +34,7 @@ export declare type FolderCreateFormProps = React.PropsWithChildren<{
     onSubmit?: (fields: FolderCreateFormInputValues) => FolderCreateFormInputValues;
     onSuccess?: (fields: FolderCreateFormInputValues) => void;
     onError?: (fields: FolderCreateFormInputValues, errorMessage: string) => void;
+    onCancel?: () => void;
     onChange?: (fields: FolderCreateFormInputValues) => FolderCreateFormInputValues;
     onValidate?: FolderCreateFormValidationValues;
 } & React.CSSProperties>;
