@@ -4,12 +4,8 @@
  * Any changes to this file will be overwritten when running amplify pull. *
  **************************************************************************/
 
-export { default as studioTheme } from "./studioTheme";
-export { default as TagCreateForm } from "./TagCreateForm";
-export { default as TagUpdateForm } from "./TagUpdateForm";
-export { default as CategoryCreateForm } from "./CategoryCreateForm";
-export { default as CategoryUpdateForm } from "./CategoryUpdateForm";
 export { default as FolderCreateForm } from "./FolderCreateForm";
 export { default as FolderUpdateForm } from "./FolderUpdateForm";
 export { default as LinkCreateForm } from "./LinkCreateForm";
 export { default as LinkUpdateForm } from "./LinkUpdateForm";
+export { default as studioTheme } from "./studioTheme";
